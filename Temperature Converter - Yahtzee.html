@@ -1,0 +1,298 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HW4</title><meta charset="utf-8">
+  <style>
+  body,div { background-color: #eee; font-family: sans; padding: 1em; }
+  .d6 {color:teal; font-size:60px;}
+  </style>
+</head>
+<body>
+  <form action="#">
+    <input type="text" id="from" /> 
+	<select id="fromUnit">
+		<option value="c">Celsius</option>
+		<option value="f">Fahrenheit</option>
+		<option value="k">Kelvin</option>
+	  </select>
+    =
+    <input type="text" id="to" />
+	  <select id="toUnit">
+		<option value="c">Celsius</option>
+		<option value="f">Fahrenheit</option>
+		<option value="k">Kelvin</option>
+	  </select>
+  </form>
+
+	<div>
+		<p id="title">YATZY</p>
+		<button id="restart">Restart</button>
+		   	 <p id="score"></p>
+			 <p id="rolls"></p>
+		<div id="dice"></div>
+	</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+  </script>
+  
+  <script>  
+  
+//Tyler Schulenberg
+//CMPS 112
+//JavaScript HW #4
+
+// 1-4 -------------------------
+// Create a temperature converter
+  $(function () {
+	$("#to").keyup(displayVals2);
+	$("#from").keyup(displayVals);
+	$("#toUnit").change(displayVals);
+	$("#fromUnit").change(displayVals);
+  });
+  
+    function displayVals() {
+		var value = $("#from").val();
+		var toConversion = $("#toUnit").val();
+		var fromConversion = $("#fromUnit").val();
+	
+		switch(fromConversion) {
+			case "c":
+				if (toConversion == "c"){
+				$("#to").val(value);
+				} else { if (toConversion == "f"){
+				value = value * (1.8) + 32;
+				$("#to").val(value);
+				} else {
+				value = value * 1 + 273;
+				$("#to").val(value);
+				}}
+				break;
+			case "f":
+				if (toConversion == "c"){
+				value = (5/9)*(value - 32);
+				$("#to").val(value);
+				} else { if (toConversion == "f"){
+				$("#to").val(value);
+				} else {
+				value = (value * 1 + 459) * (5/9);
+				$("#to").val(value);
+				}}
+				break;
+			case "k":
+				if (toConversion == "c"){
+				value = value - 273;
+				$("#to").val(value);
+				} else { if (toConversion == "f"){
+				value = (value * 1 - 273) * (9/5) + 32;
+				$("#to").val(value);
+				} else {
+				$("#to").val(value);
+				}}
+				break;
+			}
+		}
+    function displayVals2() {
+		var value = $("#to").val();
+		var toConversion = $("#toUnit").val();
+		var fromConversion = $("#fromUnit").val();
+	
+		switch(toConversion) {
+			case "c":
+				if (fromConversion == "c"){
+				$("#from").val(value);
+				} else { if (fromConversion == "f"){
+				value = value * (1.8) + 32;
+				$("#from").val(value);
+				} else {
+				value = value * 1 + 273;
+				$("#from").val(value);
+				}}
+				break;
+			case "f":
+				if (fromConversion == "c"){
+				value = (5/9)*(value - 32);
+				$("#from").val(value);
+				} else { if (fromConversion == "f"){
+				$("#from").val(value);
+				} else {
+				value = (value * 1 + 459) * (5/9);
+				$("#from").val(value);
+				}}
+				break;
+			case "k":
+				if (fromConversion == "c"){
+				value = value - 273;
+				$("#from").val(value);
+				} else { if (fromConversion == "f"){
+				value = (value * 1 - 273) * (9/5) + 32;
+				$("#from").val(value);
+				} else {
+				$("#from").val(value);
+				}}
+				break;
+			}
+		}
+// --------------------------------------------------
+//5
+// In the JavaScript part of your code, add a function randInt(min, max) that returns and integer between min (included) and max (included).
+
+	function randInt(min, max) {
+		return Math.round(Math.random() * (max-min)) + min;
+		}
+//6
+// Write a function createDice that takes the number of faces and returns a of function for rolling a single die with.
+	function createDice(numFaces) {
+		return function() {
+		return y = randInt(1, numFaces);
+		}
+	}
+	
+	
+//7,8
+// Create a prototype for six-sided dice objects. Each Dice object stores its current value (the current number shown on the top) and the corresponding HTML representation. Rolling a Dice updates both the value and the representation.
+// Change your implementation of Dice in question 7, so that clicking on the HTML element of the dice will roll it.
+
+	function Dice() {
+    // creates a new instance
+    // should assign the "this.el" property to be a jQuery-wrapped
+    // <span> HTML element with the CSS class "d6" using one of the
+    // icons as inner text.
+	
+		this.icons = "⚀⚁⚂⚃⚄⚅";
+		this.diceNum = 1;
+		this.el = $('<span>', {
+								'class' : 'd6',
+								text: '⚀'
+								});
+		var self = this;
+		this.el.click(function(){ self.roll(); });
+	}
+	
+	Dice.prototype.render = function() {
+    // updates the HTML represenation by changing the icon in the
+    // jQuery-wrapped element in the "this.el" property
+		var updatedNum = this.diceNum - 1;
+		var updatedIcon = this.icons.charAt(updatedNum);
+		this.el.text(updatedIcon);
+	}
+
+	Dice.prototype.roll = function() {
+			var randomNum = randInt(1,6);
+			this.diceNum = (randomNum);
+			this.render();
+		}
+
+	function UnfairDice() {		
+		Dice.call(this);
+	}
+//9	
+// Create a new prototype for an UnfairDice that uses inheritance to behave just like a normal Dice object from question 8 but has a 50% chance of rolling '6' but only a 10% chance for each of the other sides.
+	UnfairDice.prototype = Object.create(Dice.prototype);
+	UnfairDice.prototype.roll = function() {
+		var randomNum = randInt(1,10);
+		if (randomNum >= 6) {
+			this.diceNum = (6);
+		} else { this.diceNum = (randomNum) }
+		this.render();
+	}
+	
+	UnfairDice.prototype.render = function() {
+    // updates the HTML represenation by changing the icon in the
+    // jQuery-wrapped element in the "this.el" property
+		var updatedNum = this.diceNum - 1;
+		var updatedIcon = this.icons.charAt(updatedNum);
+		this.el.text(updatedIcon);
+	}
+	
+
+//10 
+// Implement a minimal "Yatzy" game.
+	var rollsLeft = 5;
+	$("#rolls").text(rollsLeft + " rolls left");
+	
+	function YatzyDice() {
+		Dice.call(this);		
+	}
+	YatzyDice.prototype = Object.create(Dice.prototype);
+	YatzyDice.prototype.roll = function(){
+		if (rollsLeft != 0 ){
+			rollsLeft--;
+			$("#rolls").text(rollsLeft + " rolls left");
+			var randomNum = randInt(1,6);
+			this.diceNum = (randomNum);
+			this.render();
+			}
+	}
+	YatzyDice.prototype.render = function() {
+    // updates the HTML represenation by changing the icon in the
+    // jQuery-wrapped element in the "this.el" property
+		var updatedNum = this.diceNum - 1;
+		var updatedIcon = this.icons.charAt(updatedNum);
+		this.el.text(updatedIcon);
+		calculate();
+	}
+	
+	var DiceSet = new Array(5);
+	for (var i = 0; i < 5; i++){
+		DiceSet[i] = new YatzyDice();
+		$("body").append(DiceSet[i].el);
+	}
+	
+	calculate();
+	
+	$("#restart").click(restartGame);
+	function restartGame() {
+		for (var i = 0; i < 5; i++){
+		DiceSet[i].diceNum = 1;
+		DiceSet[i].render();
+		}
+		rollsLeft = 5;
+		$("#rolls").text(rollsLeft + " rolls left");
+	//	calculate();
+	}
+	
+	function calculate(){
+		var freq = [0,0,0,0,0,0];
+		for (var i = 0; i < 5; i++){
+			var currentNum = DiceSet[i].diceNum - 1;
+			freq[currentNum]++;
+			}
+			
+		var highestNum = 0;
+		var numFrequency = 0;
+		for (var t = 0; t <= 5; t++){
+			//loop through freq array
+			//first check frequencies to get highest
+			if (freq[t] >= numFrequency){
+				highestNum = t + 1;
+				numFrequency = freq[t];
+				}
+			}
+		var gameScore = highestNum * numFrequency; 
+		$("#score").text("Score: " + gameScore +   " ("   + numFrequency + " dice with "  + highestNum + " dots each)");			
+		
+	}
+	
+	
+//11
+// In the JavaScript part of your HTML, add a function memoize that takes a one argument function f(x) and returns a function that produces the exact same results as f but stores the return values, so it does not compute the same argument more than once.
+	
+	function memoize(func) {
+		var memo = {};
+		var slice = Array.prototype.slice;
+
+		return function() {
+			var args = slice.call(arguments);
+
+			if (args in memo)
+				return memo[args];
+			else
+				return (memo[args] = func.apply(this, args));
+
+		}	
+	}
+	
+  </script>
+
+</body>
+</html>
